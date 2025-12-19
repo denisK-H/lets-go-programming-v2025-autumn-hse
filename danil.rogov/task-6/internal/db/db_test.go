@@ -1,0 +1,189 @@
+package db_test
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Tapochek2894/task-6/internal/db"
+	"github.com/stretchr/testify/require"
+)
+
+const (
+	namesQuery        = "SELECT name FROM users"
+	testName          = "Alice"
+	rowsError         = "rows error: "
+	rowsScanningError = "rows scanning: "
+	uniqueNamesQuery  = "SELECT DISTINCT name FROM users"
+)
+
+var (
+	errClosing = errors.New("error during close")
+	errQuery   = errors.New("error during query")
+)
+
+func TestCorrectGetNames(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(testName)
+
+	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+
+	expected := []string{testName}
+	database := db.New(mockDatabase)
+	got, err := database.GetNames()
+
+	require.NoError(t, err)
+	require.Equal(t, expected, got)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestIncorrectGetNames(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	mock.ExpectQuery(namesQuery).WillReturnError(errQuery)
+
+	database := db.New(mockDatabase)
+	got, err := database.GetNames()
+
+	require.Nil(t, got)
+	require.ErrorContains(t, err, rowsError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetNamesScanError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+
+	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	got, err := database.GetNames()
+
+	require.Nil(t, got)
+	require.ErrorContains(t, err, rowsScanningError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetNamesRowCloseError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errClosing)
+
+	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	expected, err := database.GetNames()
+
+	require.Nil(t, expected)
+	require.ErrorContains(t, err, rowsError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestCorrectGetUniqueNames(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(testName)
+
+	mock.ExpectQuery(uniqueNamesQuery).WillReturnRows(rows)
+
+	expected := []string{testName}
+	database := db.New(mockDatabase)
+	got, err := database.GetUniqueNames()
+
+	require.NoError(t, err)
+	require.Equal(t, expected, got)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestIncorrectGetUniqueNames(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	mock.ExpectQuery(namesQuery).WillReturnError(errQuery)
+
+	database := db.New(mockDatabase)
+	got, err := database.GetUniqueNames()
+
+	require.Nil(t, got)
+	require.ErrorContains(t, err, rowsError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetUniqueNamesScanError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+
+	mock.ExpectQuery(uniqueNamesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	got, err := database.GetUniqueNames()
+
+	require.Nil(t, got)
+	require.ErrorContains(t, err, rowsScanningError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetUniqueNamesRowCloseError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock, err := sqlmock.New()
+
+	require.NoError(t, err)
+	t.Cleanup(func() { mockDatabase.Close() })
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errClosing)
+
+	mock.ExpectQuery(uniqueNamesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	expected, err := database.GetUniqueNames()
+
+	require.Nil(t, expected)
+	require.ErrorContains(t, err, rowsError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
