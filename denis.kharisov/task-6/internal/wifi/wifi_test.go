@@ -1,8 +1,8 @@
 package wifi_test
 
 import (
-	"net"
 	"testing"
+	"net"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/mdlayher/wifi"
