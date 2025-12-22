@@ -5,8 +5,8 @@ import (
 	"testing"
 	
 	"github.com/mdlayher/wifi"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	myWiFi "github.com/denisK-H/task-6/internal/wifi"
 )
@@ -32,7 +32,7 @@ func TestGetNames_Success(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.NoError(t, err)
-	assert.Equal(t, []string{testWifi}, names)
+	require.Equal(t, []string{testWifi}, names)
 }
 
 func TestGetNames_Error(t *testing.T) {
@@ -46,7 +46,7 @@ func TestGetNames_Error(t *testing.T) {
 
 	require.Error(t, err)
 	require.Nil(t, names)
-	assert.ErrorContains(t, err, gettingInterfacesError)
+	require.ErrorContains(t, err, gettingInterfacesError)
 }
 
 func TestGetAddresses_Success(t *testing.T) {
@@ -64,7 +64,7 @@ func TestGetAddresses_Success(t *testing.T) {
 	addrs, err := service.GetAddresses()
 
 	require.NoError(t, err)
-	assert.Equal(t, []net.HardwareAddr{mac}, addrs)
+	require.Equal(t, []net.HardwareAddr{mac}, addrs)
 }
 
 func TestGetAddresses_Error(t *testing.T) {
@@ -78,5 +78,5 @@ func TestGetAddresses_Error(t *testing.T) {
 
 	require.Error(t, err)
 	require.Nil(t, addrs)
-	assert.ErrorContains(t, err, gettingInterfacesError)
+	require.ErrorContains(t, err, gettingInterfacesError)
 }
