@@ -4,9 +4,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/mdlayher/wifi"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/mdlayher/wifi"
 
 	myWiFi "github.com/denisK-H/task-6/internal/wifi"
 )
