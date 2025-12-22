@@ -55,8 +55,6 @@ func TestGetNames(t *testing.T) {
 	_, err = service.GetNames()
 	require.ErrorContains(t, err, "rows error: scan error")
 
-
-
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
