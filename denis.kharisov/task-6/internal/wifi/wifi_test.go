@@ -1,11 +1,13 @@
 package wifi_test
 
 import (
+	"net"
+	"testing"
+
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net"
-	"testing"
+
 	myWiFi "github.com/denisK-H/task-6/internal/wifi"
 )
 
