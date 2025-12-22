@@ -24,38 +24,38 @@ func TestGetNames(t *testing.T) {
 	service := db.New(d)
 
 	mock.ExpectQuery("SELECT name FROM users").
-		WillReturnRows(
-			sqlmock.NewRows([]string{"name"}).
-				AddRow("Alice").
-				AddRow("Bob"),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob"))
 
 	names, err := service.GetNames()
 	require.NoError(t, err)
 	require.Equal(t, []string{"Alice", "Bob"}, names)
 
-	mock.ExpectQuery("SELECT name FROM users").
-		WillReturnError(errDB)
+	mock.ExpectQuery("SELECT name FROM users").WillReturnError(errDB)
 
 	_, err = service.GetNames()
 	require.ErrorContains(t, err, "db query: db error")
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(123)
-	mock.ExpectQuery("SELECT name FROM users").
-		WillReturnRows(rows)
+	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	_, err = service.GetNames()
 	require.ErrorContains(t, err, "rows scanning:")
 
-	rows = sqlmock.NewRows([]string{"name"}).
-		AddRow("Alice").
-		RowError(1, errScan)
+	rows = sqlmock.NewRows([]string{"name"}).AddRow("Alice").RowError(1, errScan)
 
-	mock.ExpectQuery("SELECT name FROM users").
-		WillReturnRows(rows)
+	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	_, err = service.GetNames()
 	require.ErrorContains(t, err, "rows error: scan error")
+
+	rows = sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob").CloseError(errScan)
+
+	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
+
+	_, err = service.GetNames()
+	require.ErrorContains(t, err, "rows error: scan error")
+
+
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -70,35 +70,33 @@ func TestGetUniqueNames(t *testing.T) {
 	service := db.New(d)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
-		WillReturnRows(
-			sqlmock.NewRows([]string{"name"}).
-				AddRow("Alice").
-				AddRow("Bob"),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob"))
 
 	names, err := service.GetUniqueNames()
 	require.NoError(t, err)
 	require.Equal(t, []string{"Alice", "Bob"}, names)
 
-	mock.ExpectQuery("SELECT DISTINCT name FROM users").
-		WillReturnError(errDB)
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnError(errDB)
 
 	_, err = service.GetUniqueNames()
 	require.ErrorContains(t, err, "db query: db error")
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(123)
-	mock.ExpectQuery("SELECT DISTINCT name FROM users").
-		WillReturnRows(rows)
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	_, err = service.GetUniqueNames()
 	require.ErrorContains(t, err, "rows scanning:")
 
-	rows = sqlmock.NewRows([]string{"name"}).
-		AddRow("Alice").
-		RowError(1, errScan)
+	rows = sqlmock.NewRows([]string{"name"}).AddRow("Alice").RowError(1, errScan)
 
-	mock.ExpectQuery("SELECT DISTINCT name FROM users").
-		WillReturnRows(rows)
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
+
+	_, err = service.GetUniqueNames()
+	require.ErrorContains(t, err, "rows error: scan error")
+
+	rows = sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob").CloseError(errScan)
+
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	_, err = service.GetUniqueNames()
 	require.ErrorContains(t, err, "rows error: scan error")
