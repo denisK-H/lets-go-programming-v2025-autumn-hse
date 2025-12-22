@@ -16,7 +16,7 @@ func TestGetNames(t *testing.T) {
 	}
 	defer db.Close()
 
-	service := db.New(db)
+	service := New(db)
 
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob"))
