@@ -10,13 +10,13 @@ import (
 )
 
 func TestGetNames(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	d, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("Ошибка создания мока: %s", err)
 	}
-	defer db.Close()
+	defer d.Close()
 
-	service := New(db)
+	service := db.New(d)
 
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob"))
@@ -49,13 +49,13 @@ func TestGetNames(t *testing.T) {
 }
 
 func TestGetUniqueNames(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	d, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("Ошибка создания мока: %s", err)
 	}
-	defer db.Close()
+	defer d.Close()
 
-	service := New(db)
+	service := db.New(d)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnRows(sqlmock.NewRows([]string{"name"}).AddRow("Alice").AddRow("Bob"))
