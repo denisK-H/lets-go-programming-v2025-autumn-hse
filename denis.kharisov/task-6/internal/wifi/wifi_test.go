@@ -4,6 +4,7 @@ import (
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	myWiFi "github.com/denisK-H/task-6/internal/wifi"
 
 	"net"
@@ -15,14 +16,11 @@ const (
 	iface2Name = "wlan1"
 )
 
-var (
-	mac1 = net.HardwareAddr{0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
-	mac2 = net.HardwareAddr{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
-)
-
-
 func TestGetAddresses_Success(t *testing.T) {
 	t.Parallel()
+
+	mac1 := net.HardwareAddr{0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
+	mac2 := net.HardwareAddr{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
 
 	mockHandle := NewWiFiHandle(t)
 	mockHandle.On("Interfaces").Return([]*wifi.Interface{
